@@ -64,9 +64,7 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        #check if email exists in database
-        email_found = records.find_one({"email": email})
-        if email_found:
+        if email_found := records.find_one({"email": email}):
             email_val = email_found['email']
             passwordcheck = email_found['password']
             #encode the password and check if it matches
@@ -85,19 +83,17 @@ def login():
 
 @app.route('/logged_in')
 def logged_in():
-    if "email" in session:
-        email = session["email"]
-        return render_template('logged_in.html', email=email)
-    else:
+    if "email" not in session:
         return redirect(url_for("login"))
+    email = session["email"]
+    return render_template('logged_in.html', email=email)
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
-    if "email" in session:
-        session.pop("email", None)
-        return render_template("signout.html")
-    else:
+    if "email" not in session:
         return render_template('index.html')
+    session.pop("email", None)
+    return render_template("signout.html")
 
 
 
